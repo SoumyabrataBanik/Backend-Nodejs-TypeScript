@@ -1,0 +1,28 @@
+{
+  "name": "fullstack-app",
+  "version": "1.0.0",
+  "description": "A Fullstack App using Node, Express, MongoDB and TypeScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "JavaScript",
+    "TypeScript",
+    "Node.js",
+    "Express.js",
+    "MongoDB",
+    "Backend"
+  ],
+  "author": "Soumyabrata Banik",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.4",
+    "typescript": "^5.4.3"
+  }
+}
