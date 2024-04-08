@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 
-export type AsyncHandlerProps = {
-    fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>;
-};
+// export type AsyncHandlerProps = {
+//     fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>;
+// };
 
 export type RequestHandlerProps = (
     req: Request,
@@ -11,7 +11,7 @@ export type RequestHandlerProps = (
 ) => Promise<unknown>;
 
 const asyncHandler = (requestHandler: RequestHandlerProps) => {
-    (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction) => {
         Promise.resolve(requestHandler(req, res, next)).catch((err) =>
             next(err)
         );
