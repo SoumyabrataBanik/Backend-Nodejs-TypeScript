@@ -1,3 +1,4 @@
+import { UploadApiResponse } from "cloudinary";
 import { User } from "../models/user.models";
 import { ApiErrors } from "../utils/ApiErrors";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -25,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // }
 
     // Step 3: Check if user already exists using email or username(since it is also unique)
-    const userExists = User.findOne({
+    const userExists = await User.findOne({
         $or: [{ userName }, { email }],
     });
 
@@ -36,7 +37,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // Step 4: Check for images and avatars
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     const avatarLocalPath = files?.avatar[0]?.path;
-    const coverImageLocalPath = files?.coverImage[0]?.path;
+    const coverImageLocalPath = files?.coverImage?.[0].path || null;
 
     if (!avatarLocalPath) {
         throw new ApiErrors(400, "Avatar is required");
@@ -44,10 +45,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // Step 5: Upload them to cloudinary and check if them are prplery uploaded
     const avatar = await uploadOnCloudinary(avatarLocalPath);
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    let coverImage;
+    if (coverImageLocalPath)
+        coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
     if (!avatar) {
-        throw new ApiErrors(400, "Avatar is required.");
+        throw new ApiErrors(400, "Avatar failed to be uploaded.");
     }
 
     // Step 6: Create user object and then create entry in db
