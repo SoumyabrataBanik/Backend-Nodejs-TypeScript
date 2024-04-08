@@ -1,9 +1,9 @@
 class ApiErrors extends Error {
     statusCode: number;
     message: string;
-    errors: Array<string>;
+    errors?: Array<string>;
     stack?: string;
-    data: unknown | null;
+    data?: unknown | null;
     success: boolean;
 
     constructor(
