@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { IUserAuthInfoRequest } from "../types/types";
 
 // export type AsyncHandlerProps = {
 //     fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>;
@@ -6,6 +7,12 @@ import { Request, Response, NextFunction } from "express";
 
 export type RequestHandlerProps = (
     req: Request,
+    res: Response,
+    next: NextFunction
+) => Promise<unknown>;
+
+export type LoginRequestHandlerProps = (
+    req: IUserAuthInfoRequest,
     res: Response,
     next: NextFunction
 ) => Promise<unknown>;
@@ -18,7 +25,15 @@ const asyncHandler = (requestHandler: RequestHandlerProps) => {
     };
 };
 
-export { asyncHandler };
+const asyncHandlerLogin = (requestHandler: LoginRequestHandlerProps) => {
+    return (req: IUserAuthInfoRequest, res: Response, next: NextFunction) => {
+        Promise.resolve(requestHandler(req, res, next)).catch((err) =>
+            next(err)
+        );
+    };
+};
+
+export { asyncHandler, asyncHandlerLogin };
 
 // const asyncHandler =
 //     (fn: AsyncHandlerProps["fn"]) =>

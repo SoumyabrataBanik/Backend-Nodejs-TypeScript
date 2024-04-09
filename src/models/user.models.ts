@@ -1,8 +1,28 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import jwt, { Secret } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema(
+export interface IUser {
+    _id?: number;
+    userName: string;
+    email: string;
+    fullName: string;
+    avatar: string;
+    coverImage: string;
+    watchHistory: mongoose.Schema.Types.ObjectId;
+    password: string;
+    refreshToken: string;
+}
+
+interface IUserMethods {
+    isPasswordCorrect(password: string): Promise<boolean>;
+    generateAccessToken(): string;
+    generateRefreshToken(): string;
+}
+
+export type UserModel = Model<IUser, {}, IUserMethods>;
+
+export const userSchema = new mongoose.Schema<IUser, UserModel, IUserMethods>(
     {
         userName: {
             type: String,
@@ -40,7 +60,7 @@ const userSchema = new mongoose.Schema(
         ],
         password: {
             type: String,
-            required: ["true", "Password is required"],
+            required: [true, "Password is required"],
         },
         refreshToken: {
             type: String,
@@ -49,24 +69,16 @@ const userSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-async function hashPassword(
-    password: string | null | undefined
-): Promise<string | null> {
-    if (password === null || password === undefined) {
-        return null;
-    }
-
-    return bcrypt.hash(password, 10);
-}
-
 userSchema.pre("save", async function (next) {
     if (this.isModified("password") && this.password) {
-        this.password = await hashPassword(this.password);
+        this.password = await bcrypt.hash(this.password, 10);
     }
     next();
 });
 
-userSchema.methods.isPasswordCorrect = async function (password: string) {
+userSchema.methods.isPasswordCorrect = async function (
+    password: string
+): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
 };
 
@@ -97,4 +109,6 @@ userSchema.methods.generateRefreshToken = function () {
     );
 };
 
-export const User = mongoose.model("User", userSchema);
+const User = mongoose.model<IUser, UserModel>("User", userSchema);
+
+export { User };
