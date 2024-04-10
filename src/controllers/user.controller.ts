@@ -248,6 +248,8 @@ const updateUserDetails = asyncHandler(async (req, res) => {
         throw new ApiErrors(400, "Need details to update profile");
     }
 
+    console.log((req as any)?.user);
+
     const user = await User.findById((req as any)?.user._id);
 
     if (!user) {
@@ -259,10 +261,18 @@ const updateUserDetails = asyncHandler(async (req, res) => {
     }
 
     if (userName) {
+        const userNameExists = await User.findOne({ userName });
+        if (userNameExists) {
+            throw new ApiErrors(400, "User name already exists");
+        }
         user.userName = userName;
     }
 
     if (email) {
+        const userEmailExists = await User.findOne({ email });
+        if (userEmailExists) {
+            throw new ApiErrors(400, "Email already exists");
+        }
         user.email = email;
     }
 
