@@ -241,6 +241,38 @@ const getCurrentUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, "Current user fetched successfully"));
 });
 
+const updateUserDetails = asyncHandler(async (req, res) => {
+    const { fullName, userName, email } = req.body;
+
+    if (!fullName && !email && !userName) {
+        throw new ApiErrors(400, "Need details to update profile");
+    }
+
+    const user = await User.findById((req as any)?.user._id);
+
+    if (!user) {
+        throw new ApiErrors(400, "Invalid User access");
+    }
+
+    if (fullName) {
+        user.fullName = fullName;
+    }
+
+    if (userName) {
+        user.userName = userName;
+    }
+
+    if (email) {
+        user.email = email;
+    }
+
+    user.save();
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "User details updated successfully"));
+});
+
 export {
     loginUser,
     logoutUser,
@@ -248,4 +280,5 @@ export {
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
+    updateUserDetails,
 };
