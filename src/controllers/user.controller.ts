@@ -284,6 +284,12 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 });
 
 const updateAvatar = asyncHandler(async (req, res) => {
+    const userId = (req as any)?.user?._id;
+
+    if (!userId) {
+        throw new ApiErrors(400, "Invalid access");
+    }
+
     const avatarLocalPath = req.file?.path;
 
     if (!avatarLocalPath) {
@@ -300,12 +306,53 @@ const updateAvatar = asyncHandler(async (req, res) => {
     }
 
     await User.findByIdAndUpdate(
-        (req as any)?.user?._id,
+        userId,
         {
             $set: { avatar: avatar.url },
         },
         { new: true }
     ).select("-password -refreshToken");
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Avatar updated successfully"));
+});
+
+const updateCoverImage = asyncHandler(async (req, res) => {
+    const userId = (req as any)?.user._id;
+
+    if (!userId) {
+        throw new ApiErrors(400, "Invalid User Access");
+    }
+
+    const coverImageLocalPath = req?.file?.path;
+
+    if (!coverImageLocalPath) {
+        throw new ApiErrors(400, "No Cover Image found");
+    }
+
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+    if (!coverImage) {
+        throw new ApiErrors(
+            500,
+            "Error occured while uploading files to cloudinary"
+        );
+    }
+
+    await User.findByIdAndUpdate(
+        userId,
+        {
+            $set: {
+                coverImage: coverImage.url,
+            },
+        },
+        { new: true }
+    ).select("-password -refreshToken");
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "Cover Image updated Successfully"));
 });
 
 export {
@@ -317,4 +364,5 @@ export {
     getCurrentUser,
     updateUserDetails,
     updateAvatar,
+    updateCoverImage,
 };
