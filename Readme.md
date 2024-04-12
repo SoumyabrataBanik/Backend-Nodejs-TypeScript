@@ -1,3 +1,3 @@
-# Fullstack App
+# Backend Designed on Node.js, Express.js and MongoDB
 
-This is a fullstack app built using Node.js, Express.js, MongoDB, Mongoose and TypeScript.
+This backend is built using Node.js, Express.js, MongoDB, Mongoose and TypeScript.
